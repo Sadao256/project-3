@@ -133,11 +133,12 @@
                      $("#response").html(data.message);
                      console.log("Text: " + text); // Debugging statement to check the value of 'text'
 
+                     $("#found-words-list").html(data.found_words+" ");
+
                      if (data.redirect) {
-                        $("#found-words-list").append(text+" ");
                      
                         console.log("Text: " + text); // Debugging statement to check the value of 'text'
-
+                        
                         window.location.href = "/success";
 
                      }
