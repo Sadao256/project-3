@@ -73,15 +73,31 @@
          <br />
          <div class="row">
             <div class="col-xs-6 text-center">
-               <form id="entry" method="POST" action="/_check">
+               <form id="entry">
                   <label for="attempt">Word:</label>
                   <input id="attempt" name="attempt" type="text" width="15"
-                     autocomplete="off"  autofocus />
-                  <input type="submit" name="try" />
+                     autocomplete="off"  autofocus />            
                </form>
             </div>
+         </div>	  
+
+      <div class="row">
+         <div class="col-xs-6 text-center">
+            <div id="response"></div> <!-- Add this line for displaying responses -->
          </div>
-         <br />
+      </div>
+      
+      <div class="row">
+         <div class="col-xs-6 text-center">
+            <h2>You found</h2>
+            <div id="found-words-list">
+               <!-- This will be populated dynamically by JavaScript -->
+            </div>
+         </div>
+      </div>
+
+
+	 <br />
          {% if session.matches|length is not equalto 0  %}
          <h2>You found </h2>
          <p id="results">
@@ -100,5 +116,36 @@
          {% endwith %}
       </div>
       <!-- container -->
+      <script>
+            $(document).ready(function () {
+               $("#attempt").on("keyup", function (event) {
+                  var text = $("#attempt").val();
+                  var keycode = event.which;
+                  var letter = String.fromCharCode(keycode);
+                  console.log("Text: " + text); // Debugging statement to check the value of 'text'
+
+
+                  if (! "ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(letter)) { return }
+
+                  console.log("Text: " + text); // Debugging statement to check the value of 'text'
+
+                  $.getJSON("/_check", { text: text }, function (data) {
+                     $("#response").html(data.message);
+                     console.log("Text: " + text); // Debugging statement to check the value of 'text'
+
+                     if (data.redirect) {
+                        $("#found-words-list").append(text+" ");
+                     
+                        console.log("Text: " + text); // Debugging statement to check the value of 'text'
+
+                        window.location.href = "/success";
+
+                     }
+                  });
+
+               });
+            });
+       </script>
+
    </body>
 </html>

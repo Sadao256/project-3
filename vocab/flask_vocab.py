@@ -5,6 +5,7 @@ from a scrambled string)
 """
 
 import flask
+from flask import request, jsonify
 import logging
 
 # Our modules
@@ -79,24 +80,30 @@ def success():
 #   a JSON request handler
 #######################
 
-@app.route("/_check", methods=["POST"])
+@app.route("/_check", methods=["GET"])
 def check():
     """
     User has submitted the form with a word ('attempt')
     that should be formed from the jumble and on the
-    vocabulary list.  We respond depending on whether
+    vocabulary list. We respond depending on whether
     the word is on the vocab list (therefore correctly spelled),
     made only from the jumble letters, and not a word they
     already found.
     """
     app.logger.debug("Entering check")
 
-    # The data we need, from form and from cookie
-    text = flask.request.form["attempt"]
+    # The data we need, from form and from session
+    text = request.args.get("text")
     jumble = flask.session["jumble"]
     matches = flask.session.get("matches", [])  # Default to empty list
 
-    # Is it good?
+
+    response_data = {
+        "message": "",
+        "redirect": False,
+        "found_words": matches  # Include the list of found words
+    }
+
     in_jumble = LetterBag(jumble).contains(text)
     matched = WORDS.has(text)
 
@@ -105,22 +112,19 @@ def check():
         # Cool, they found a new word
         matches.append(text)
         flask.session["matches"] = matches
+        response_data["message"] = "Good job! You found a new word."
     elif text in matches:
-        flask.flash("You already found {}".format(text))
+        response_data["message"] = "You already found {}".format(text)
     elif not matched:
-        flask.flash("{} isn't in the list of words".format(text))
+        response_data["message"] = "{} isn't in the list of words".format(text)
     elif not in_jumble:
-        flask.flash(
-            '"{}" can\'t be made from the letters {}'.format(text, jumble))
-    else:
-        app.logger.debug("This case shouldn't happen!")
-        assert False  # Raises AssertionError
+        response_data["message"] = '"{}" can\'t be made from the letters {}'.format(text, jumble)
 
-    # Choose page:  Solved enough, or keep going?
+    # Choose page: Solved enough, or keep going?
     if len(matches) >= flask.session["target_count"]:
-       return flask.redirect(flask.url_for("success"))
-    else:
-       return flask.redirect(flask.url_for("keep_going"))
+        response_data["redirect"] = True
+
+    return jsonify(response_data)
 
 
 ###############
