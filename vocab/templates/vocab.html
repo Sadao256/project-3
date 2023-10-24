@@ -117,6 +117,10 @@
       </div>
       <!-- container -->
       <script>
+            $("#entry").submit(function (event) {
+               event.preventDefault();
+            });
+
             $(document).ready(function () {
                $("#attempt").on("keyup", function (event) {
                   var text = $("#attempt").val();
