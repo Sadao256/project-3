@@ -1,4 +1,7 @@
-# UOCIS322 - Project 3 #
+# UO CS322 - Project 3 #
+# due:10-23-2023
+# Aidan McCoy
+
 
 You'll learn about JQuery and asynchronous requests in this project.
 

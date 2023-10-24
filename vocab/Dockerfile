@@ -1,5 +1,5 @@
 FROM python:3.8
-LABEL Aidan McCot="acsm3002@gmail.com"
+LABEL Aidan McCoy="acsm3002@gmail.com"
 RUN apt-get update -y
 COPY . /app
 WORKDIR /app
